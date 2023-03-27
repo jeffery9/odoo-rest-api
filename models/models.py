@@ -18,7 +18,7 @@ class IrHttp(models.AbstractModel):
             access_token = access_token[7:]
 
         user_id = request.env["res.users.apikeys"]._check_credentials(
-            scope="odoo.plugin.outlook", key=access_token
+            scope="odoo.api", key=access_token
         )
         if not user_id:
             raise BadRequest("Access token invalid")
