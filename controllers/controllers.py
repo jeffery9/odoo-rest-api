@@ -15,7 +15,6 @@ _logger = logging.getLogger(__name__)
 
 def error_response(error, msg):
     return {
-
         "error": {
             "code": 200,
             "message": msg,
@@ -24,8 +23,8 @@ def error_response(error, msg):
                 "debug": "",
                 "message": msg,
                 "arguments": list(error.args),
-                "exception_type": type(error).__name__
-            }
+                "exception_type": type(error).__name__,
+            },
         }
     }
 
@@ -34,7 +33,7 @@ ori_get_request = Root.get_request
 
 
 def get_request(self, httprequest):
-    if httprequest.full_path == '/rest/?':
+    if httprequest.full_path == "/rest/?":
         return HttpRequest(httprequest)
     else:
         return ori_get_request(self, httprequest)
@@ -44,32 +43,34 @@ Root.get_request = get_request
 
 
 class OdooAPI(http.Controller):
-    @http.route(
-        '/auth/',
-        type='json', auth='none', methods=["POST"], csrf=False)
+    @http.route("/auth/", type="json", auth="none", methods=["POST"], csrf=False)
     def authenticate(self, *args, **post):
         try:
             login = post["login"]
         except KeyError:
-            raise exceptions.AccessDenied(message='`login` is required.')
+            raise exceptions.AccessDenied(message="`login` is required.")
 
         try:
             password = post["password"]
         except KeyError:
-            raise exceptions.AccessDenied(message='`password` is required.')
+            raise exceptions.AccessDenied(message="`password` is required.")
 
         try:
             db = post["db"]
         except KeyError:
-            raise exceptions.AccessDenied(message='`db` is required.')
+            raise exceptions.AccessDenied(message="`db` is required.")
 
         http.request.session.authenticate(db, login, password)
-        res = request.env['ir.http'].session_info()
+        res = request.env["ir.http"].session_info()
         return res
 
     @http.route(
-        '/rest/object/<string:model>/<string:function>',
-        type='http', auth='user', methods=["POST"], csrf=False)
+        "/rest/object/<string:model>/<string:function>",
+        type="http",
+        auth="key",
+        methods=["POST"],
+        csrf=False,
+    )
     def call_model_function(self, model, function, **post):
         args = []
         kwargs = {}
@@ -82,8 +83,12 @@ class OdooAPI(http.Controller):
         return result
 
     @http.route(
-        '/rest/object/<string:model>/<int:rec_id>/<string:function>',
-        type='http', auth='user', methods=["POST"], csrf=False)
+        "/rest/object/<string:model>/<int:rec_id>/<string:function>",
+        type="http",
+        auth="key",
+        methods=["POST"],
+        csrf=False,
+    )
     def call_obj_function(self, model, rec_id, function, **post):
         args = []
         kwargs = {}
@@ -96,8 +101,8 @@ class OdooAPI(http.Controller):
         return result
 
     @http.route(
-        '/rest/<string:model>',
-        type='http', auth='user', methods=['GET'], csrf=False)
+        "/rest/<string:model>", type="http", auth="key", methods=["GET"], csrf=False
+    )
     def get_model_data(self, model, **params):
         try:
             records = request.env[model].search([])
@@ -105,9 +110,7 @@ class OdooAPI(http.Controller):
             msg = "The model `%s` does not exist." % model
             res = error_response(e, msg)
             return http.Response(
-                json.dumps(res),
-                status=200,
-                mimetype='application/json'
+                json.dumps(res), status=200, mimetype="application/json"
             )
 
         if "query" in params:
@@ -141,12 +144,12 @@ class OdooAPI(http.Controller):
             start = page_size * (current_page - 1)
             stop = current_page * page_size
             records = records[start:stop]
-            next_page = current_page + 1 \
-                if 0 < current_page + 1 <= total_page_number \
-                else None
-            prev_page = current_page - 1 \
-                if 0 < current_page - 1 <= total_page_number \
-                else None
+            next_page = (
+                current_page + 1 if 0 < current_page + 1 <= total_page_number else None
+            )
+            prev_page = (
+                current_page - 1 if 0 < current_page - 1 <= total_page_number else None
+            )
 
         if "limit" in params:
             limit = int(params["limit"])
@@ -158,9 +161,7 @@ class OdooAPI(http.Controller):
         except (SyntaxError, QueryFormatError) as e:
             res = error_response(e, e.msg)
             return http.Response(
-                json.dumps(res),
-                status=200,
-                mimetype='application/json'
+                json.dumps(res), status=200, mimetype="application/json"
             )
 
         res = {
@@ -169,17 +170,17 @@ class OdooAPI(http.Controller):
             "current": current_page,
             "next": next_page,
             "total_pages": total_page_number,
-            "result": data
+            "result": data,
         }
-        return http.Response(
-            json.dumps(res),
-            status=200,
-            mimetype='application/json'
-        )
+        return http.Response(json.dumps(res), status=200, mimetype="application/json")
 
     @http.route(
-        '/rest/<string:model>/<int:rec_id>',
-        type='http', auth='user', methods=['GET'], csrf=False)
+        "/rest/<string:model>/<int:rec_id>",
+        type="http",
+        auth="key",
+        methods=["GET"],
+        csrf=False,
+    )
     def get_model_rec(self, model, rec_id, **params):
         try:
             records = request.env[model].search([])
@@ -187,9 +188,7 @@ class OdooAPI(http.Controller):
             msg = "The model `%s` does not exist." % model
             res = error_response(e, msg)
             return http.Response(
-                json.dumps(res),
-                status=200,
-                mimetype='application/json'
+                json.dumps(res), status=200, mimetype="application/json"
             )
 
         if "query" in params:
@@ -206,23 +205,17 @@ class OdooAPI(http.Controller):
         except (SyntaxError, QueryFormatError) as e:
             res = error_response(e, e.msg)
             return http.Response(
-                json.dumps(res),
-                status=200,
-                mimetype='application/json'
+                json.dumps(res), status=200, mimetype="application/json"
             )
 
-        return http.Response(
-            json.dumps(data),
-            status=200,
-            mimetype='application/json'
-        )
+        return http.Response(json.dumps(data), status=200, mimetype="application/json")
 
     @http.route(
-        '/rest/<string:model>/',
-        type='http', auth="user", methods=['POST'], csrf=False)
+        "/rest/<string:model>/", type="http", auth="user", methods=["POST"], csrf=False
+    )
     def post_model_data(self, model, **post):
         try:
-            data = post['data']
+            data = post["data"]
         except KeyError:
             msg = "`data` parameter is not found on POST request body"
             raise exceptions.ValidationError(msg)
@@ -244,11 +237,15 @@ class OdooAPI(http.Controller):
 
     # This is for single record update
     @http.route(
-        '/rest/<string:model>/<int:rec_id>/',
-        type='http', auth="user", methods=['PUT'], csrf=False)
+        "/rest/<string:model>/<int:rec_id>/",
+        type="http",
+        auth="user",
+        methods=["PUT"],
+        csrf=False,
+    )
     def put_model_record(self, model, rec_id, **post):
         try:
-            data = post['data']
+            data = post["data"]
         except KeyError:
             msg = "`data` parameter is not found on PUT request body"
             raise exceptions.ValidationError(msg)
@@ -261,8 +258,9 @@ class OdooAPI(http.Controller):
 
         if "context" in post:
             # TODO: Handle error raised by `ensure_one`
-            rec = model_to_put.with_context(**post["context"]) \
-                .browse(rec_id).ensure_one()
+            rec = (
+                model_to_put.with_context(**post["context"]).browse(rec_id).ensure_one()
+            )
         else:
             rec = model_to_put.browse(rec_id).ensure_one()
 
@@ -273,21 +271,15 @@ class OdooAPI(http.Controller):
                 for operation in data[field]:
                     if operation == "push":
                         operations.extend(
-                            (4, rec_id, _)
-                            for rec_id
-                            in data[field].get("push")
+                            (4, rec_id, _) for rec_id in data[field].get("push")
                         )
                     elif operation == "pop":
                         operations.extend(
-                            (3, rec_id, _)
-                            for rec_id
-                            in data[field].get("pop")
+                            (3, rec_id, _) for rec_id in data[field].get("pop")
                         )
                     elif operation == "delete":
                         operations.extend(
-                            (2, rec_id, _)
-                            for rec_id
-                            in data[field].get("delete")
+                            (2, rec_id, _) for rec_id in data[field].get("delete")
                         )
                     else:
                         data[field].pop(operation)  # Invalid operation
@@ -306,11 +298,11 @@ class OdooAPI(http.Controller):
 
     # This is for bulk update
     @http.route(
-        '/rest/<string:model>/',
-        type='http', auth="user", methods=['PUT'], csrf=False)
+        "/rest/<string:model>/", type="http", auth="user", methods=["PUT"], csrf=False
+    )
     def put_model_records(self, model, **post):
         try:
-            data = post['data']
+            data = post["data"]
         except KeyError:
             msg = "`data` parameter is not found on PUT request body"
             raise exceptions.ValidationError(msg)
@@ -325,8 +317,7 @@ class OdooAPI(http.Controller):
         filters = post["filter"]
 
         if "context" in post:
-            recs = model_to_put.with_context(**post["context"]) \
-                .search(filters)
+            recs = model_to_put.with_context(**post["context"]).search(filters)
         else:
             recs = model_to_put.search(filters)
 
@@ -337,21 +328,15 @@ class OdooAPI(http.Controller):
                 for operation in data[field]:
                     if operation == "push":
                         operations.extend(
-                            (4, rec_id, _)
-                            for rec_id
-                            in data[field].get("push")
+                            (4, rec_id, _) for rec_id in data[field].get("push")
                         )
                     elif operation == "pop":
                         operations.extend(
-                            (3, rec_id, _)
-                            for rec_id
-                            in data[field].get("pop")
+                            (3, rec_id, _) for rec_id in data[field].get("pop")
                         )
                     elif operation == "delete":
                         operations.extend(
-                            (2, rec_id, _)
-                            for rec_id in
-                            data[field].get("delete")
+                            (2, rec_id, _) for rec_id in data[field].get("delete")
                         )
                     else:
                         pass  # Invalid operation
@@ -374,8 +359,12 @@ class OdooAPI(http.Controller):
 
     # This is for deleting one record
     @http.route(
-        '/rest/<string:model>/<int:rec_id>/',
-        type='http', auth="user", methods=['DELETE'], csrf=False)
+        "/rest/<string:model>/<int:rec_id>/",
+        type="http",
+        auth="user",
+        methods=["DELETE"],
+        csrf=False,
+    )
     def delete_model_record(self, model, rec_id, **post):
         try:
             model_to_del_rec = request.env[model]
@@ -383,9 +372,7 @@ class OdooAPI(http.Controller):
             msg = "The model `%s` does not exist." % model
             res = error_response(e, msg)
             return http.Response(
-                json.dumps(res),
-                status=200,
-                mimetype='application/json'
+                json.dumps(res), status=200, mimetype="application/json"
             )
 
         # TODO: Handle error raised by `ensure_one`
@@ -393,26 +380,24 @@ class OdooAPI(http.Controller):
 
         try:
             is_deleted = rec.unlink()
-            res = {
-                "result": is_deleted
-            }
+            res = {"result": is_deleted}
             return http.Response(
-                json.dumps(res),
-                status=200,
-                mimetype='application/json'
+                json.dumps(res), status=200, mimetype="application/json"
             )
         except Exception as e:
             res = error_response(e, str(e))
             return http.Response(
-                json.dumps(res),
-                status=200,
-                mimetype='application/json'
+                json.dumps(res), status=200, mimetype="application/json"
             )
 
     # This is for bulk deletion
     @http.route(
-        '/rest/<string:model>/',
-        type='http', auth="user", methods=['DELETE'], csrf=False)
+        "/rest/<string:model>/",
+        type="http",
+        auth="user",
+        methods=["DELETE"],
+        csrf=False,
+    )
     def delete_model_records(self, model, **post):
         filters = json.loads(post["filter"])
 
@@ -422,9 +407,7 @@ class OdooAPI(http.Controller):
             msg = "The model `%s` does not exist." % model
             res = error_response(e, msg)
             return http.Response(
-                json.dumps(res),
-                status=200,
-                mimetype='application/json'
+                json.dumps(res), status=200, mimetype="application/json"
             )
 
         # TODO: Handle error raised by `filters`
@@ -432,25 +415,23 @@ class OdooAPI(http.Controller):
 
         try:
             is_deleted = recs.unlink()
-            res = {
-                "result": is_deleted
-            }
+            res = {"result": is_deleted}
             return http.Response(
-                json.dumps(res),
-                status=200,
-                mimetype='application/json'
+                json.dumps(res), status=200, mimetype="application/json"
             )
         except Exception as e:
             res = error_response(e, str(e))
             return http.Response(
-                json.dumps(res),
-                status=200,
-                mimetype='application/json'
+                json.dumps(res), status=200, mimetype="application/json"
             )
 
     @http.route(
-        '/rest/<string:model>/<int:rec_id>/<string:field>',
-        type='http', auth="user", methods=['GET'], csrf=False)
+        "/rest/<string:model>/<int:rec_id>/<string:field>",
+        type="http",
+        auth="user",
+        methods=["GET"],
+        csrf=False,
+    )
     def get_binary_record(self, model, rec_id, field, **post):
         try:
             request.env[model]
@@ -458,9 +439,7 @@ class OdooAPI(http.Controller):
             msg = "The model `%s` does not exist." % model
             res = error_response(e, msg)
             return http.Response(
-                json.dumps(res),
-                status=200,
-                mimetype='application/json'
+                json.dumps(res), status=200, mimetype="application/json"
             )
 
         rec = request.env[model].browse(rec_id).ensure_one()
@@ -468,6 +447,4 @@ class OdooAPI(http.Controller):
             src = getattr(rec, field).decode("utf-8")
         else:
             src = False
-        return http.Response(
-            src
-        )
+        return http.Response(src)
