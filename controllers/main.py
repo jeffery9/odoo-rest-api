@@ -137,7 +137,7 @@ class OdooAPI(http.Controller):
             records = request.env[model]
             params = request.get_http_params()
 
-            _logger.warning(params)
+            _logger.debug(params)
 
             if "query" in params:
                 query = params["query"]
@@ -151,7 +151,15 @@ class OdooAPI(http.Controller):
 
             if "filter" in params:
                 filters = json.loads(params["filter"])
-                records = request.env[model].search(filters, order=orders)
+            else:
+                filters = []
+
+            if "limit" in params:
+                limit = int(params["limit"])
+            else:
+                limit = 80
+
+            record_count = request.env[model].search_count(filters, limit=limit)
 
             prev_page = None
             next_page = None
@@ -160,16 +168,16 @@ class OdooAPI(http.Controller):
 
             if "page_size" in params:
                 page_size = int(params["page_size"])
-                count = len(records)
+                count = record_count
                 total_page_number = math.ceil(count / page_size)
 
                 if "page" in params:
                     current_page = int(params["page"])
+                    offset = page_size * (current_page - 1)
                 else:
                     current_page = 1  # Default page Number
-                start = page_size * (current_page - 1)
-                stop = current_page * page_size
-                records = records[start:stop]
+                    offset = 0
+
                 next_page = (
                     current_page + 1
                     if 0 < current_page + 1 <= total_page_number
@@ -181,12 +189,12 @@ class OdooAPI(http.Controller):
                     else None
                 )
 
-            if "limit" in params:
-                limit = int(params["limit"])
-                records = records[0:limit]
+            records = request.env[model].search(
+                filters, offset=offset, order=orders, limit=limit
+            )
 
-                serializer = Serializer(records, query, many=True)
-                data = serializer.data
+            serializer = Serializer(records, query, many=True)
+            data = serializer.data
 
         except (SyntaxError, QueryFormatError) as e:
             res = error_response(e, e.msg)
@@ -214,16 +222,20 @@ class OdooAPI(http.Controller):
     )
     def get_one_record(self, model, rec_id, **params):
         try:
-            # all_fields = (
-            #     request.env["ir.model"].search([("model", "=", model)]).fields_get()
-            # )
-            # _logger.warning(all_fields)
+            if "query" in params:
+                query = params["query"]
+            else:
+                query = "{*}"
 
-            data = (
+            records = (
                 request.env[model]
                 .with_context(active_test=True)
                 .search_read([("id", "=", rec_id)])
             )
+
+            serializer = Serializer(records, query, many=True)
+            data = serializer.data
+
             if data:
                 return request.make_json_response(data)
             else:
