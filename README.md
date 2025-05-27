@@ -1,593 +1,396 @@
 # Odoo REST API
-This is a module which expose Odoo as a REST API 
+
+This is a module which exposes Odoo 18 as a REST API with proper JSON responses and Bearer token authentication.
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/jeffery9/odoo-rest-api)
 
 ## Installing
-* Download this module and put it to your Odoo addons directory
-* Install requirements with `pip install -r requirements.txt`
+
+- Download this module and put it to your Odoo addons directory
+- Install requirements with pip install -r requirements.txt
+- Ensure you have API keys configured in Odoo for authentication
 
 ## Getting Started
 
-### Authenticating users
-Before making any request make sure you are authenticated. The route which is used to authenticate users is `/auth/`. Below is an example showing how to authenticate users.
-```py
-import json
-import requests
-import sys
+### Authentication
 
-AUTH_URL = 'http://localhost:8069/auth/'
+This API uses Bearer token authentication with API keys. You need to include the Authorization header with your API key in all requests.
 
-headers = {'Content-type': 'application/json'}
-
-
-# Remember to configure default db on odoo configuration file(dbfilter = ^db_name$)
-# Authentication credentials
-data = {
-    'params': {
-         'login': 'your@email.com',
-         'password': 'yor_password',
-         'db': 'your_db_name'
-    }
-}
-
-# Authenticate user
-res = requests.post(
-    AUTH_URL, 
-    data=json.dumps(data), 
-    headers=headers
-)
-
-# Get response cookies
-# This hold information for authenticated user
-cookies = res.cookies
-
-
-# Example 1
-# Get users
-USERS_URL = 'http://localhost:8069/rest/res.users/'
-
-# This will take time since it retrives all res.users fields
-# You can use query param to fetch specific fields
-
-res = requests.get(
-    USERS_URL, 
-    cookies=cookies  # Here we are sending cookies which holds info for authenticated user
-)
-
-# This will be a very long response since it has many data
-print(res.text)
-
-
-# Example 2
-# Get products(assuming you have products in you db)
-# Here am using query param to fetch only product id and name(This will be faster)
-USERS_URL = 'http://localhost:8069/rest/product.product/'
-
-# Use query param to fetch only id and name
-params = {'query': '{id, name}'}
-
-res = requests.get(
-    USERS_URL, 
-    params=params,
-    cookies=cookies  # Here we are sending cookies which holds info for authenticated user
-)
-
-# This will be small since we've retrieved only id and name
-print(res.text)
+```python
+import json  
+import requests  
+  
+# API endpoints  
+BASE_URL = 'http://localhost:8069'  
+API_BASE = f'{BASE_URL}/api/v1'  
+  
+# Set up headers with API key  
+headers = {  
+    'Content-Type': 'application/json',  
+    'Authorization': 'Bearer your_api_key_here'  
+}  
+  
+# Example 1: Get users  
+USERS_URL = f'{API_BASE}/res.users'  
+  
+res = requests.get(USERS_URL, headers=headers)  
+response_data = res.json()  
+  
+if response_data['success']:  
+    users = response_data['data']['records']  
+    print(f"Found {len(users)} users")  
+else:  
+    print(f"Error: {response_data['error']['message']}")  
+  
+# Example 2: Get products with field selection  
+PRODUCTS_URL = f'{API_BASE}/product.product'  
+params = {'query': '{id, name}'}  
+  
+res = requests.get(PRODUCTS_URL, params=params, headers=headers)  
+print(res.json())
 ```
 
+## API Response Format
 
-## Allowed HTTP methods 
+All API responses follow a consistent JSON format:
+
+Success Response:
+
+```json
+{  
+    "success": true,  
+    "message": "Operation completed successfully",  
+    "data": {  
+        // Response data here  
+    },  
+    "timestamp": "2024-01-01T12:00:00.000Z"  
+}
+```
+
+Error Response:
+
+```json
+{  
+    "success": false,  
+    "error": {  
+        "code": 400,  
+        "message": "Error description",  
+        "type": "ValidationError",  
+        "details": "Detailed error information"  
+    },  
+    "timestamp": "2024-01-01T12:00:00.000Z"  
+}
+```
+
+## Allowed HTTP Methods
 
 ## 1. GET
 
-### Model records: 
+### Get All Records: GET /api/v1/{model}
 
-`GET /rest/{model}/`
-#### Parameters 
-* **query (optional):**
-
-   This parameter is used to dynamically select fields to include on a response. For example if we want to select `id` and `name` fields from `res.users` model here is how we would do it.
-
-   `GET /rest/res.users/?query={id, name}`
-
-   ```js
-   {
-       "count": 2, 
-       "prev": null, 
-       "current": 1, 
-       "next": null, 
-       "total_pages": 1, 
-       "result": [
-           {
-               "id": 2, 
-               "name": "Administrator"
-            }, 
-           {
-               "id": 6, 
-               "name": "Sailors Co Ltd"
-            }
-        ]
-    }
-   ```
-   
-   For nested records, for example if we want to select `id`, `name` and `company_id` fields from `res.users` model, but under `company_id` we want to select `name` field only. here is how we would do it.
-
-   `GET /rest/res.users/?query={id, name, company_id{name}}`
-
-   ```js
-   {
-       "count": 2, 
-       "prev": null, 
-       "current": 1, 
-       "next": null, 
-       "total_pages": 1, 
-       "result": [
-           {
-               "id": 2, 
-               "name": "Administrator",
-               "company_id": {
-                   "name": "Singo Africa"
-               }
-            }, 
-           {
-               "id": 6, 
-               "name": "Sailors Co Ltd",
-               "company_id": {
-                   "name": "Singo Africa"
-               }
-            }
-        ]
-    }
-   ```
-
-   For nested iterable records, for example if we want to select `id`, `name` and `related_products` fields from `product.template` model, but under `related_products` we want to select `name` field only. here is how we would do it.
-
-   `GET /rest/product.template/?query={id, name, related_products{name}}`
-
-   ```js
-   {
-       "count": 2, 
-       "prev": null, 
-       "current": 1, 
-       "next": null, 
-       "total_pages": 1, 
-       "result": [
-           {
-               "id": 16, 
-               "name": "Alaf Resincot Steel Roof-16", 
-               "related_products": [
-                   {"name": "Alloy Steel AISI 4140 Bright Bars - All 5.8 meter longs"}, 
-                   {"name": "Test product"}
-                ]
-            }, 
-            {
-                "id": 18,
-                 "name": "Alaf Resincot Steel Roof-43", 
-                 "related_products": [
-                     {"name": "Alloy Steel AISI 4140 Bright Bars - All 5.8 meter longs"}, 
-                     {"name": "Aluminium Sheets & Plates"}, 
-                     {"name": "Test product"}
-                 ]
-            }
-        ]
-   }
-   ```
-
-   If you want to fetch all fields except few you can use exclude(-) operator. For example in the case above if we want to fetch all fields except `name` field, here is how we could do it   
-   `GET /rest/product.template/?query={-name}`
-   
-   ```js
-   {
-        "count": 3, 
-        "prev": null, 
-        "current": 1, 
-        "next": null, 
-        "total_pages": 1, 
-        "result": [
-            {   
-                "id": 1,
-                ... // All fields except name
-            }, 
-            {
-                "id": 2
-                ... // All fields except name
-            }
-            ...
-        ]
-   }
-   ```
-
-   There is also a wildcard(\*) operator which can be used to fetch all fields, Below is an example which shows how you can fetch all product's fields but under `related_products` field get all fields except `id`.
-
-   `GET /rest/product.template/?query={*, related_products{-id}}`
-
-   ```js
-   {
-        "count": 3, 
-        "prev": null, 
-        "current": 1, 
-        "next": null, 
-        "total_pages": 1, 
-        "result": [
-            {   
-                "id": 1,
-                "name": "Pen",
-                "related_products"{
-                    "name": "Pencil",
-                    ... // All fields except id
-                }
-                ... // All fields
-            }, 
-            ...
-        ]
-   }
-   ```
-
-   **If you don't specify query parameter all fields will be returned.**
-
-
-* **filter (optional):**
-
-    This is used to filter out data returned. For example if we want to get all products with id ranging from 60 to 70, here's how we would do it.
-
-    `GET /rest/product.template/?query={id, name}&filter=[["id", ">", 60], ["id", "<", 70]]`
-
-    ```js
-    {
-        "count": 3, 
-        "prev": null, 
-        "current": 1, 
-        "next": null, 
-        "total_pages": 1, 
-        "result": [
-            {
-                "id": 67, 
-                "name": "Crown Paints Economy Superplus Emulsion"
-            }, 
-            {
-                "id": 69,
-                "name": "Crown Paints Permacote"
-            }
-        ]
-    }
-    ```
-
-* **page_size (optional) & page (optional):**
-
-    These two allows us to do pagination. Hre page_size is used to specify number of records on a single page and page is used to specify the current page. For example if we want our page_size to be 5 records and we want to fetch data on page 3 here is how we would do it.
-
-    `GET /rest/product.template/?query={id, name}&page_size=5&page=3`
-
-    ```js
-    {
-        "count": 5, 
-        "prev": 2, 
-        "current": 3, 
-        "next": 4, 
-        "total_pages": 15, 
-        "result": [
-            {"id": 141, "name": "Borewell Slotting Pipes"}, 
-            {"id": 114, "name": "Bright Bars"}, 
-            {"id": 128, "name": "Chain Link Fence"}, 
-            {"id": 111, "name": "Cold Rolled Sheets - CRCA & GI Sheets"}, 
-            {"id": 62, "name": "Crown Paints Acrylic Primer/Sealer Undercoat"}
-        ]
-    }
-    ```
-
-    Note: `prev`, `current`, `next` and `total_pages` shows the previous page, current page, next page and the total number of pages respectively.
-
-* **limit (optional):**
-
-    This is used to limit the number of results returned on a request regardless of pagination. For example
-    
-    `GET /rest/product.template/?query={id, name}&limit=3`
-
-    ```js
-    {
-        "count": 3, 
-        "prev": null, 
-        "current": 1, 
-        "next": null, 
-        "total_pages": 1, 
-        "result": [
-            {"id": 16, "name": "Alaf Resincot Steel Roof-16"}, 
-            {"id": 18, "name": "Alaf Resincot Steel Roof-43"}, 
-            {"id": 95, "name": "Alaf versatile steel roof"}
-        ]
-    }
-    ```
-
-### Model record:  
-
-`GET /rest/{model}/{id}`
 #### Parameters
-* **query (optional):**
 
-    Here query parameter works exactly the same as explained before except it selects fields on a single record. For example
+- query (optional): Field selection using query syntax
+- filter (optional): JSON-encoded domain filter
+- order (optional): JSON-encoded order specification
+- limit (optional): Maximum number of records (max 1000)
+- page_size (optional): Records per page for pagination (max 1000)
+- page (optional): Page number for pagination
 
-    `GET /rest/product.template/95/?query={id, name}`
+#### Examples
 
-    ```js
-    {
-        "id": 95, 
-        "name": "Alaf versatile steel roof"
-    }
-    ```
+Basic request:
 
+```python
+GET /api/v1/res.users?query={id, name}  
+
+```
+
+Response:
+
+```json
+{  
+    "success": true,  
+    "message": "Records retrieved successfully",  
+    "data": {  
+        "records": [  
+            {"id": 2, "name": "Administrator"},  
+            {"id": 6, "name": "Demo User"}  
+        ],  
+        "pagination": {  
+            "count": 2,  
+            "total_count": 2,  
+            "current_page": 1,  
+            "total_pages": 1,  
+            "page_size": null,  
+            "prev_page": null,  
+            "next_page": null  
+        }  
+    },  
+    "timestamp": "2024-01-01T12:00:00.000Z"  
+}
+```
+
+Nested field selection:
+
+```python
+GET /api/v1/res.users?query={id, name, company_id{name}}  
+
+```
+
+Filtering:
+
+```python
+GET /api/v1/product.template?filter=[["list_price", ">", 100]]&query={id, name, list_price}  
+
+```
+
+Pagination:
+
+```python
+GET /api/v1/product.template?page_size=10&page=2&query={id, name}  
+
+```
+
+### Get Single Record: GET /api/v1/{model}/{id}
+
+#### Parameters
+
+- query (optional): Field selection
+
+#### Example
+
+```python
+GET /api/v1/product.template/95?query={id, name, list_price}  
+
+```
 
 ## 2. POST
 
-`POST /rest/{model}/`
-#### Headers
-* Content-Type: application/json
-#### Parameters 
-* **data (mandatory):**
+### Create Record: POST /api/v1/{model}/
 
-    This is used to pass data to be posted. For example
-    
-    `POST /rest/product.public.category/`
+#### Request Body
 
-    Request Body
+```json
+{  
+    "data": {  
+        "name": "New Product",  
+        "list_price": 100.0  
+    },  
+    "context": {  
+        "lang": "en_US"  
+    }  
+}
+```
 
-    ```js
-    {
-        "params": {
-            "data": {
-                "name": "Test category_2"
-            }
-        }
-    }
-    ```
+#### Response
 
-    Response
+```json
+{  
+    "success": true,  
+    "message": "Record created successfully",  
+    "data": {  
+        "id": 123,  
+        "name": "New Product",  
+        "list_price": 100.0  
+    },  
+    "timestamp": "2024-01-01T12:00:00.000Z"  
+}
+```
 
-    ```js
-    {
-        "result": 398
-    }
-    ```
+### Batch Create: POST /api/v1/{model}/batch
 
-    The number on `result` is the `id` of the newly created record.
+#### Request Body
 
-* **context (optional):**
-
-    This is used to pass any context if it's needed when creating new record. The format of passing it is
-
-    Request Body
-
-    ```js
-    {
-        "params": {
-            "context": {
-                "context_1": "context_1_value",
-                "context_2": "context_2_value",
-                ....
-            },
-            "data": {
-                "field_1": "field_1_value",
-                "field_2": "field_2_value",
-                ....
-            }
-        }
-    }
-    ```
+```json
+{  
+    "data": [  
+        {"name": "Product 1", "list_price": 50.0},  
+        {"name": "Product 2", "list_price": 75.0}  
+    ]  
+}
+```
 
 ## 3. PUT
 
-### Model records: 
+### Update Single Record: PUT /api/v1/{model}/{id}/
 
-`PUT /rest/{model}/`
-#### Headers
-* Content-Type: application/json
-#### Parameters
-* **data (mandatory):**
+#### Request Body
 
-    This is used to pass data to update, it works with filter parameter, See example below
-
-* **filter (mandatory):**
-
-    This is used to filter data to update. For example
-
-    `PUT /rest/product.template/`
-
-    Request Body
-
-    ```js
-    {
-        "params": {
-            "filter": [["id", "=", 95]],
-            "data": {
-                "name": "Test product"
-            }
-        }
-    }
-    ```
-
-    Response
-
-    ```js
-    {
-        "result": true
-    }
-    ```
-
-    Note: If the result is true it means success and if false or otherwise it means there was an error during update.
-
-* **context (optional):**
-    Just like in GET context is used to pass any context associated with record update. The format of passing it is
-
-    Request Body
-
-    ```js
-    {
-        "params": {
-            "context": {
-                "context_1": "context_1_value",
-                "context_2": "context_2_value",
-                ....
-            },
-            "filter": [["id", "=", 95]],
-            "data": {
-                "field_1": "field_1_value",
-                "field_2": "field_2_value",
-                ....
-            }
-        }
-    }
-    ```
-
-* **operation (optional)**:
-
-    This is only applied to `one2many` and `many2many` fields. The concept is sometimes you might not want to replace all records on either `one2many` or `many2many` fields, instead you might want to add other records or remove some records, this is where put operations comes in place. Thre are basically three PUT operations which are push, pop and delete. 
-    * push is used to add/append other records to existing linked records
-    * pop is used to remove/unlink some records from the record being updated but it doesn't delete them on the system
-    * delete is used to remove/unlink and delete records permanently on the system
-
-    For example here is how you would update `related_product_ids` which is `many2many` field with PUT operations
-
-    `PUT /rest/product.template/`
-
-    Request Body
-
-    ```js
-    {
-        "params": {
-            "filter": [["id", "=", 95]],
-            "data": {
-                "related_product_ids": {
-                    "push": [102, 30],
-                    "pop": [45],
-                    "delete": [55]
-                }
-            }
-        }
-    }
-    ```
-
-    This will append product with ids 102 and 30 as related products to product with id 95 and from there unlink product with id 45 and again unlink product with id 55 and delete it from the system. So if befor this request product with id 95 had [20, 37, 45, 55] as related product ids, after this request it will be [20, 37, 102, 30].
-
-    Note: You can use one operation or two or all three at a time depending on what you want to update on your field. If you dont use these operations on `one2many` and `many2many` fields, existing values will be replaced by new values passed, so you need to be very carefull on this part.
-
-    Response:
-
-    ```js
-    {
-        "result": true
-    }
-    ```
-
-### Model record: 
-
-`PUT /rest/{model}/{id}`
-#### Headers
-* Content-Type: application/json
-#### Parameters
-* data (mandatory)
-* context (optional)
-* PUT operation(push, pop, delete) (optional)
-
-All parameters works the same as explained on previous section, what changes is that here they apply to a single record being updated and we don't have filter parameter because `id` of record to be updated is passed on URL as `{id}`. Example to give us an idea of how this works.
-
-`PUT /rest/product.template/95/`
-
-Request Body
-
-```js
-{
-    "params": {
-        "data": {
-            "related_product_ids": {
-                "push": [102, 30],
-                "pop": [45],
-                "delete": [55]
-            }
-        }
-    }
+```json
+{  
+    "data": {  
+        "name": "Updated Product Name",  
+        "list_price": 150.0  
+    }  
 }
 ```
+
+### Update Multiple Records: PUT /api/v1/{model}/
+
+#### Request Body with Filter
+
+```json
+{  
+    "filter": [["category_id", "=", 5]],  
+    "data": {  
+        "active": false  
+    }  
+}
+```
+
+#### Request Body with IDs (via URL params)
+
+```python
+PUT /api/v1/product.template/?id=[1,2,3]  
+
+```
+
+```json
+{  
+    "data": {  
+        "list_price": 200.0  
+    }  
+}
+```
+
+### Relational Field Operations
+
+For one2many and many2many fields, you can use these operations:
+
+```json
+{  
+    "data": {  
+        "category_ids": {  
+            "link": [1, 2, 3],  
+            "unlink": [4, 5],  
+            "delete": [6],  
+            "set": [1, 2, 7, 8]  
+        }  
+    }  
+}
+```
+
+Operations:
+
+- link: Add existing records to the relation
+- unlink: Remove records from relation (but don't delete them)
+- delete: Remove and delete records permanently
+- set: Replace all related records with the specified list
+- create: Create new records and link them
+- update: Update existing related records
+- clear: Remove all related records
 
 ## 4. DELETE
 
-### Model records: 
+### Delete Single Record: DELETE /api/v1/{model}/{id}/
 
-`DELETE /rest/{model}/`
-#### Parameters
-* **filter (mandatory):**
+#### Response
 
-    This is used to filter data to delete. For example
-
-    `DELETE /rest/product.template/?filter=[["id", "=", 95]]`
-
-    Response
-
-    ```js
-    {
-        "result": true
-    }
-    ```
-    
-    Note: If the result is true it means success and if false or otherwise it means there was an error during deletion.
-
-
-### Model records: 
-
-`DELETE /rest/{model}/{id}`
-#### Parameters
-This takes no parameter and we don't have filter parameter because `id` of record to be deleted is passed on URL as `{id}`. Example to give us an idea of how this works.
-
-`DELETE /rest/product.template/95/`
-
-Response
-
-```js
-{
-    "result": true
+```json
+{  
+    "success": true,  
+    "message": "Record deleted successfully",  
+    "data": {  
+        "success": true,  
+        "message": "Record deleted successfully"  
+    },  
+    "timestamp": "2024-01-01T12:00:00.000Z"  
 }
 ```
 
-## Calling Model's Function
+### Delete Multiple Records: DELETE /api/v1/{model}/?id=[1,2,3]
 
-Sometimes you might need to call model's function or a function bound to a record, inorder to do so, send a `POST` request with a body containing arguments(args) and keyword arguments(kwargs) required by the function you want to call.
+## 5. Function Calls
 
-Below is how you can call model's function
+### Call Model Method: POST /api/v1/object/{model}/{function}
 
-`POST /object/{model}/{function name}`
+#### Request Body
 
-Request Body
-
-```js
-{
-    "params": {
-	"args": [arg1, arg2, ..],
-	"kwargs ": {
-	    "key1": "value1",
-	    "key2": "value2",
-	    ...
-	}
-    }
+```json
+{  
+    "args": ["arg1", "arg2"],  
+    "kwargs": {  
+        "key1": "value1",  
+        "key2": "value2"  
+    }  
 }
 ```
 
-And below is how you can call a function bound to a record
+### Call Record Method: POST /api/v1/object/{model}/{id}/{function}
 
-`POST /object/{model}/{record_id}/{function name}`
+#### Request Body
 
-Request Body
-
-```js
-{
-    "params": {
-	"args": [arg1, arg2, ..],
-	"kwargs ": {
-	    "key1": "value1",
-	    "key2": "value2",
-	    ...
-	}
-    }
+```json
+{  
+    "args": [],  
+    "kwargs": {  
+        "force": true  
+    }  
 }
 ```
 
-In both cases the response will be the result returned by the function called
+## Additional Endpoints
+
+### Advanced Search: POST /api/v1/{model}/search
+
+```json
+{  
+    "domain": [["name", "ilike", "test"]],  
+    "fields": ["id", "name", "email"],  
+    "limit": 50,  
+    "offset": 0,  
+    "order": "name ASC"  
+}
+```
+
+### Get Model Fields: GET /api/v1/{model}/fields
+
+Returns field definitions for the specified model.
+
+### Get File/Binary Field: GET /api/v1/{model}/{id}/{field}
+
+Downloads binary field content.
+
+### Health Check: GET /api/v1/health
+
+Check API status (no authentication required).
+
+### API Information: GET /api/v1/info
+
+Get API version and endpoint information.
+
+## Query Language
+
+The query parameter supports a powerful field selection syntax:
+
+- {id, name} - Select specific fields
+- {*} - Select all fields
+- {-password} - Exclude specific fields
+- {user{name, email}} - Nested field selection
+- {*, user{-password}} - All fields with nested exclusions
+
+## Error Handling
+
+The API returns appropriate HTTP status codes:
+
+- 200 - Success
+- 400 - Bad Request (validation errors)
+- 404 - Not Found
+- 500 - Internal Server Error
+
+All errors include detailed error information in the response body.
+
+## Authentication Setup
+
+1. Create API keys in Odoo: Settings → Users & Companies → API Keys
+2. Set the scope to "odoo.api"
+3. Use the generated key in the Authorization header: Bearer your_api_key
+
+## Notes
+
+- All timestamps are in ISO 8601 format
+- Maximum limit per request is 1000 records
+- Binary fields are base64 encoded in JSON responses
+- The API supports Odoo's domain filter syntax for complex queries
+- Relational fields return IDs by default, use nested queries for full objects
