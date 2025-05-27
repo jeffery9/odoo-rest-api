@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import re
+from typing import Dict, List, Union, Any
 
 from pypeg2 import List, contiguous, csl, name, optional, parse
 
@@ -10,11 +12,11 @@ class IncludedField(List):
 
 
 class ExcludedField(List):
-    grammar = contiguous('-', name())
+    grammar = contiguous("-", name())
 
 
 class AllFields(str):
-    grammar = '*'
+    grammar = "*"
 
 
 class BaseArgument(List):
@@ -24,30 +26,28 @@ class BaseArgument(List):
 
 
 class ArgumentWithoutQuotes(BaseArgument):
-    grammar = name(), ':', re.compile(r'[^,:"\'\)]+')
+    grammar = name(), ":", re.compile(r'[^,:"\'\)]+')
 
 
 class ArgumentWithSingleQuotes(BaseArgument):
-    grammar = name(), ':', "'", re.compile(r'[^\']+'), "'"
+    grammar = name(), ":", "'", re.compile(r"[^\']+"), "'"
 
 
 class ArgumentWithDoubleQuotes(BaseArgument):
-    grammar = name(), ':', '"', re.compile(r'[^"]+'), '"'
+    grammar = name(), ":", '"', re.compile(r'[^"]+'), '"'
 
 
 class Arguments(List):
-    grammar = optional(csl(
-        [
-            ArgumentWithoutQuotes,
-            ArgumentWithSingleQuotes,
-            ArgumentWithDoubleQuotes
-        ],
-        separator=','
-    ))
+    grammar = optional(
+        csl(
+            [ArgumentWithoutQuotes, ArgumentWithSingleQuotes, ArgumentWithDoubleQuotes],
+            separator=",",
+        )
+    )
 
 
 class ArgumentsBlock(List):
-    grammar = optional('(', Arguments, ')')
+    grammar = optional("(", Arguments, ")")
 
     @property
     def arguments(self):
@@ -62,6 +62,7 @@ class ParentField(List):
     self[0]  returns IncludedField instance,
     self[1]  returns Block instance
     """
+
     @property
     def name(self):
         return self[0].name
@@ -72,14 +73,13 @@ class ParentField(List):
 
 
 class BlockBody(List):
-    grammar = optional(csl(
-        [ParentField, IncludedField, ExcludedField, AllFields],
-        separator=','
-    ))
+    grammar = optional(
+        csl([ParentField, IncludedField, ExcludedField, AllFields], separator=",")
+    )
 
 
 class Block(List):
-    grammar = ArgumentsBlock, '{', BlockBody, '}'
+    grammar = ArgumentsBlock, "{", BlockBody, "}"
 
     @property
     def arguments(self):
@@ -99,24 +99,30 @@ class Block(List):
 ParentField.grammar = IncludedField, Block
 
 
-class Parser(object):
-    def __init__(self, query):
-        self._query = query
+class Parser:
+    def __init__(self, query: str) -> None:
+        if not isinstance(query, str):
+            raise QueryFormatError("Query must be a string")
+        if not query.strip():
+            raise QueryFormatError("Query cannot be empty")
+        self._query = query.strip()
 
-    def get_parsed(self):
-        parse_tree = parse(self._query, Block)
-        return self._transform_block(parse_tree)
+    def get_parsed(self) -> Dict[str, Union[List, Dict]]:
+        try:
+            parse_tree = parse(self._query, Block)
+            return self._transform_block(parse_tree)
+        except Exception as e:
+            # Provide more specific error context
+            raise QueryFormatError(
+                f"Invalid query syntax: {str(e)} in query: {self._query}"
+            )
 
     def _transform_block(self, block):
-        fields = {
-            "include": [],
-            "exclude": [],
-            "arguments": {}
-        }
+        fields = {"include": [], "exclude": [], "arguments": {}}
 
         for argument in block.arguments:
             argument = {str(argument.name): argument.value}
-            fields['arguments'].update(argument)
+            fields["arguments"].update(argument)
 
         for field in block.body:
             # A field may be a parent or included field or excluded field
@@ -140,15 +146,14 @@ class Parser(object):
             add_include_all_operator = True
             for field in fields["include"]:
                 if field == "*":
-                    # `*` operator is alredy in fields['include']
+                    # `*` operator is already in fields['include']
                     add_include_all_operator = False
                     continue
 
                 if isinstance(field, str):
                     # Including and excluding fields on the same field level
                     msg = (
-                        "Can not include and exclude fields on the same "
-                        "field level"
+                        "Can not include and exclude fields on the same " "field level"
                     )
                     raise QueryFormatError(msg)
 
@@ -168,4 +173,3 @@ class Parser(object):
         parent_field_name = str(parent_field.name)
         parent_field_value = self._transform_block(parent_field.block)
         return {parent_field_name: parent_field_value}
-        
