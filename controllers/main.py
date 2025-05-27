@@ -6,7 +6,7 @@ import ast
 import datetime  
 from datetime import datetime  
   
-from odoo import http, exceptions, _, release  
+from odoo import http, exceptions, _, release, Command  
 from odoo.http import request, Dispatcher  
 from odoo.exceptions import AccessError, AccessDenied, UserError, ValidationError  
   
@@ -519,14 +519,28 @@ class OdooAPI(http.Controller):
                 if isinstance(value, dict):
                     operations = []
                     for operation, ids in value.items():
-                        if operation == "push":
-                            operations.extend((4, id_, 0) for id_ in ids)
-                        elif operation == "pop":
-                            operations.extend((3, id_, 0) for id_ in ids)
-                        elif operation == "delete":
-                            operations.extend((2, id_, 0) for id_ in ids)
-                        elif operation == "replace":
-                            operations.append((6, 0, ids))
+                        if operation == "create":  
+                            # 创建新记录并链接  
+                            operations.extend(Command.create(record_data) for record_data in ids)  
+                        elif operation == "link":  
+                            # 链接现有记录  
+                            operations.extend(Command.link(id_) for id_ in ids)  
+                        elif operation == "unlink":  
+                            # 取消链接记录  
+                            operations.extend(Command.unlink(id_) for id_ in ids)  
+                        elif operation == "delete":  
+                            # 删除记录  
+                            operations.extend(Command.delete(id_) for id_ in ids)  
+                        elif operation == "update":  
+                            # 更新记录  
+                            for update_data in ids:  
+                                operations.append(Command.update(update_data['id'], update_data['values']))  
+                        elif operation == "set":  
+                            # 替换所有记录  
+                            operations.append(Command.set(ids))  
+                        elif operation == "clear":  
+                            # 清除所有记录  
+                            operations.append(Command.clear()) 
                     processed_data[field] = operations
                 elif isinstance(value, list):
                     processed_data[field] = [(6, 0, value)]
