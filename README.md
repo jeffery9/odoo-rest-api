@@ -1,6 +1,7 @@
 # Odoo REST API
 This is a module which expose Odoo as a REST API 
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/jeffery9/odoo-rest-api)
 
 ## Installing
 * Download this module and put it to your Odoo addons directory
