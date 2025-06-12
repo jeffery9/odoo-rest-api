@@ -887,3 +887,396 @@ class OdooAPI(http.Controller):
             return self.make_json_response(
                 error_response(e, "Internal server error", 500), status=500
             )
+
+    @http.route('/api/v1/openapi.json', type='http', auth='public', methods=['GET'], csrf=False)  
+    def openapi_spec(self):  
+        openapi_spec = {  
+            "openapi": "3.0.0",  
+            "info": {  
+                "title": "Odoo REST API",  
+                "version": "1.0.0",  
+                "description": "REST API for Odoo models"  
+            },  
+            "servers": [{"url": "/api/v1"}],  
+            "components": {  
+                "securitySchemes": {  
+                    "ApiKeyAuth": {  
+                        "type": "apiKey",  
+                        "in": "header",  
+                        "name": "Authorization"  
+                    }  
+                }  
+            },  
+            "security": [{"ApiKeyAuth": []}],  
+            "paths": self._generate_paths()  
+        }  
+        return http.Response(json.dumps(openapi_spec), mimetype='application/json')
+
+    def _generate_paths(self):  
+        return {  
+            # CRUD 端点 - 获取所有记录  
+            "/{model}": {  
+                "get": {  
+                    "summary": "Get all records",  
+                    "description": "Retrieve multiple records from the specified model",  
+                    "parameters": [  
+                        {  
+                            "name": "model",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"},  
+                            "description": "Odoo model name (e.g., res.partner, product.product)"  
+                        },  
+                        {  
+                            "name": "query",  
+                            "in": "query",  
+                            "schema": {"type": "string", "default": "{*}"},  
+                            "description": "Field selection query (e.g., {id,name,email})"  
+                        },  
+                        {  
+                            "name": "filter",  
+                            "in": "query",  
+                            "schema": {"type": "string"},  
+                            "description": "JSON-encoded domain filter (e.g., [[\"name\",\"ilike\",\"test\"]])"  
+                        },  
+                        {  
+                            "name": "order",  
+                            "in": "query",  
+                            "schema": {"type": "string"},  
+                            "description": "JSON-encoded sort specification"  
+                        },  
+                        {  
+                            "name": "limit",  
+                            "in": "query",  
+                            "schema": {"type": "integer", "default": 80},  
+                            "description": "Maximum number of records to return"  
+                        },  
+                        {  
+                            "name": "page_size",  
+                            "in": "query",  
+                            "schema": {"type": "integer"},  
+                            "description": "Number of records per page"  
+                        },  
+                        {  
+                            "name": "page",  
+                            "in": "query",  
+                            "schema": {"type": "integer", "default": 1},  
+                            "description": "Page number for pagination"  
+                        }  
+                    ],  
+                    "responses": {  
+                        "200": {  
+                            "description": "Success",  
+                            "content": {  
+                                "application/json": {  
+                                    "schema": {  
+                                        "type": "object",  
+                                        "properties": {  
+                                            "count": {"type": "integer", "description": "Number of records returned"},  
+                                            "prev": {"type": "integer", "nullable": True, "description": "Previous page number"},  
+                                            "current": {"type": "integer", "description": "Current page number"},  
+                                            "next": {"type": "integer", "nullable": True, "description": "Next page number"},  
+                                            "total_pages": {"type": "integer", "description": "Total number of pages"},  
+                                            "result": {"type": "array", "items": {"type": "object"}, "description": "Array of records"}  
+                                        }  
+                                    }  
+                                }  
+                            }  
+                        }  
+                    }  
+                },  
+                "post": {  
+                    "summary": "Create record",  
+                    "description": "Create a new record in the specified model",  
+                    "parameters": [  
+                        {  
+                            "name": "model",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"}  
+                        }  
+                    ],  
+                    "requestBody": {  
+                        "required": True,  
+                        "content": {  
+                            "application/json": {  
+                                "schema": {  
+                                    "type": "object",  
+                                    "properties": {  
+                                        "data": {"type": "object", "description": "Record data"},  
+                                        "context": {"type": "object", "description": "Additional context"}  
+                                    },  
+                                    "required": ["data"]  
+                                }  
+                            }  
+                        }  
+                    },  
+                    "responses": {  
+                        "200": {"description": "Record created successfully"}  
+                    }  
+                },  
+                "put": {  
+                    "summary": "Update multiple records",  
+                    "description": "Update multiple records matching the filter",  
+                    "parameters": [  
+                        {  
+                            "name": "model",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"}  
+                        }  
+                    ],  
+                    "requestBody": {  
+                        "required": True,  
+                        "content": {  
+                            "application/json": {  
+                                "schema": {  
+                                    "type": "object",  
+                                    "properties": {  
+                                        "filter": {"type": "array", "description": "Domain filter"},  
+                                        "data": {"type": "object", "description": "Update data"},  
+                                        "context": {"type": "object", "description": "Additional context"}  
+                                    },  
+                                    "required": ["filter", "data"]  
+                                }  
+                            }  
+                        }  
+                    },  
+                    "responses": {  
+                        "200": {"description": "Records updated successfully"}  
+                    }  
+                },  
+                "delete": {  
+                    "summary": "Delete multiple records",  
+                    "description": "Delete multiple records matching the filter",  
+                    "parameters": [  
+                        {  
+                            "name": "model",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"}  
+                        },  
+                        {  
+                            "name": "filter",  
+                            "in": "query",  
+                            "required": True,  
+                            "schema": {"type": "string"},  
+                            "description": "JSON-encoded domain filter"  
+                        }  
+                    ],  
+                    "responses": {  
+                        "200": {"description": "Records deleted successfully"}  
+                    }  
+                }  
+            },  
+            
+            # CRUD 端点 - 单个记录操作  
+            "/{model}/{id}": {  
+                "get": {  
+                    "summary": "Get single record",  
+                    "description": "Retrieve a single record by ID",  
+                    "parameters": [  
+                        {  
+                            "name": "model",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"}  
+                        },  
+                        {  
+                            "name": "id",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "integer"}  
+                        },  
+                        {  
+                            "name": "query",  
+                            "in": "query",  
+                            "schema": {"type": "string", "default": "{*}"},  
+                            "description": "Field selection query"  
+                        }  
+                    ],  
+                    "responses": {  
+                        "200": {"description": "Record retrieved successfully"},  
+                        "404": {"description": "Record not found"}  
+                    }  
+                },  
+                "put": {  
+                    "summary": "Update single record",  
+                    "description": "Update a single record by ID",  
+                    "parameters": [  
+                        {  
+                            "name": "model",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"}  
+                        },  
+                        {  
+                            "name": "id",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "integer"}  
+                        }  
+                    ],  
+                    "requestBody": {  
+                        "required": True,  
+                        "content": {  
+                            "application/json": {  
+                                "schema": {  
+                                    "type": "object",  
+                                    "properties": {  
+                                        "data": {"type": "object", "description": "Update data"},  
+                                        "context": {"type": "object", "description": "Additional context"}  
+                                    },  
+                                    "required": ["data"]  
+                                }  
+                            }  
+                        }  
+                    },  
+                    "responses": {  
+                        "201": {"description": "Record updated successfully"}  
+                    }  
+                },  
+                "delete": {  
+                    "summary": "Delete single record",  
+                    "description": "Delete a single record by ID",  
+                    "parameters": [  
+                        {  
+                            "name": "model",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"}  
+                        },  
+                        {  
+                            "name": "id",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "integer"}  
+                        }  
+                    ],  
+                    "responses": {  
+                        "200": {"description": "Record deleted successfully"}  
+                    }  
+                }  
+            },  
+            
+            # 函数调用端点 - 模型级别  
+            "/object/{model}/{function}": {  
+                "post": {  
+                    "summary": "Call model function",  
+                    "description": "Call a function on the specified model",  
+                    "parameters": [  
+                        {  
+                            "name": "model",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"}  
+                        },  
+                        {  
+                            "name": "function",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"}  
+                        }  
+                    ],  
+                    "requestBody": {  
+                        "content": {  
+                            "application/json": {  
+                                "schema": {  
+                                    "type": "object",  
+                                    "properties": {  
+                                        "args": {"type": "array", "description": "Positional arguments"},  
+                                        "kwargs": {"type": "object", "description": "Keyword arguments"}  
+                                    }  
+                                }  
+                            }  
+                        }  
+                    },  
+                    "responses": {  
+                        "200": {"description": "Function executed successfully"}  
+                    }  
+                }  
+            },  
+            
+            # 函数调用端点 - 记录级别  
+            "/object/{model}/{id}/{function}": {  
+                "post": {  
+                    "summary": "Call record function",  
+                    "description": "Call a function on a specific record",  
+                    "parameters": [  
+                        {  
+                            "name": "model",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"}  
+                        },  
+                        {  
+                            "name": "id",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "integer"}  
+                        },  
+                        {  
+                            "name": "function",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"}  
+                        }  
+                    ],  
+                    "requestBody": {  
+                        "content": {  
+                            "application/json": {  
+                                "schema": {  
+                                    "type": "object",  
+                                    "properties": {  
+                                        "args": {"type": "array", "description": "Positional arguments"},  
+                                        "kwargs": {"type": "object", "description": "Keyword arguments"}  
+                                    }  
+                                }  
+                            }  
+                        }  
+                    },  
+                    "responses": {  
+                        "200": {"description": "Function executed successfully"}  
+                    }  
+                }  
+            },  
+            
+            # 文件访问端点  
+            "/{model}/{id}/{field}": {  
+                "get": {  
+                    "summary": "Get file field",  
+                    "description": "Retrieve a file field from a specific record",  
+                    "parameters": [  
+                        {  
+                            "name": "model",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"}  
+                        },  
+                        {  
+                            "name": "id",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "integer"}  
+                        },  
+                        {  
+                            "name": "field",  
+                            "in": "path",  
+                            "required": True,  
+                            "schema": {"type": "string"},  
+                            "description": "Binary field name"  
+                        }  
+                    ],  
+                    "responses": {  
+                        "200": {  
+                            "description": "File content",  
+                            "content": {  
+                                "text/plain": {  
+                                    "schema": {"type": "string"}  
+                                }  
+                            }  
+                        }  
+                    }  
+                }  
+            }  
+        }
