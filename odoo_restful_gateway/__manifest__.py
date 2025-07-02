@@ -29,4 +29,7 @@
     "installable": True,
     "auto_install": False,
     "external_dependencies": {"python": ["pypeg2"]},
+    'price': 10,
+    'currency': 'USD',
+    'license': 'OPL-1',
 }
