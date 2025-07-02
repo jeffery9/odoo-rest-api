@@ -4,120 +4,350 @@
         <div style="text-align: center; font-size: 0;">    
             <div style="display: inline-block; width: 100%; vertical-align: top; font-size: 14px; box-sizing: border-box;">    
                 <h2 class="oe_slogan" style="color:rgb(201, 56, 43);">      
-                    Odoo REST API 模块 | Odoo REST API Module      
+                    Odoo RESTful Gateway | Odoo RESTful 网关      
                 </h2>      
                 <h3 class="oe_slogan" style="color:#666;">      
                     为 Odoo  提供完整的 REST API 接口，支持 Bearer Token 认证<br/>      
                     Complete REST API interface for Odoo  with Bearer Token authentication      
                 </h3>      
                 <!-- <div class="oe_demo oe_picture oe_screenshot">      
-                    <img src="odoo_rest_api_main.png" alt="Odoo REST API demo"/>      
+                    <img src="odoo_restful_gateway_main.png" alt="Odoo RESTful Gateway demo"/>      
                 </div>       -->
             </div>    
         </div>    
     </div>      
 </section>  
-    
-<section class="oe_container">      
-    <div class="oe_row oe_spaced">      
-        <div class="oe_span12">      
-            <h2 class="oe_slogan" style="color:rgb(201, 56, 43);">核心功能 | Key Features</h2>      
-            <div style="text-align: center; margin: 0 -15px; font-size: 0;">      
-                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
-                    <div style="text-align: center;">      
-                        <i class="fa fa-database fa-3x" style="color:rgb(201, 56, 43); margin-bottom: 16px; display: block;"></i>      
-                        <h4 style="margin-bottom: 16px;">完整 CRUD 操作 | Full CRUD Operations</h4>      
-                        <p style="color: #666;">支持创建、读取、更新、删除所有 Odoo 模型记录<br/>Create, Read, Update, Delete operations for all Odoo models</p>      
-                    </div>      
-                </div>      
-                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
-                    <div style="text-align: center;">      
-                        <i class="fa fa-shield fa-3x" style="color:rgb(201, 56, 43); margin-bottom: 16px; display: block;"></i>      
-                        <h4 style="margin-bottom: 16px;">Bearer Token 认证 | Bearer Token Authentication</h4>      
-                        <p style="color: #666;">安全的 API 密钥认证机制，保护数据访问<br/>Secure API key authentication mechanism for data protection</p>      
-                    </div>      
-                </div>      
-                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
-                    <div style="text-align: center;">      
-                        <i class="fa fa-code fa-3x" style="color:rgb(201, 56, 43); margin-bottom: 16px; display: block;"></i>      
-                        <h4 style="margin-bottom: 16px;">标准 JSON 响应 | Standard JSON Response</h4>      
-                        <p style="color: #666;">统一的 JSON 响应格式，包含成功状态和时间戳<br/>Consistent JSON response format with success status and timestamp</p>      
-                    </div>      
-                </div>      
-            </div>      
-        </div>      
-    </div>      
-</section>   
-    
-<section class="oe_container oe_dark">      
-    <div class="oe_row oe_spaced">      
-        <div class="oe_span12">      
-            <h2 class="oe_slogan" style="color:rgb(201, 56, 43);">      
-                高级特性 | Advanced Features      
-            </h2>      
-            <div style="text-align: center; margin: 0 -15px; font-size: 0;">      
-                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
-                    <div style="text-align: center;">      
-                        <i class="fa fa-search fa-3x" style="color:rgb(201, 56, 43); margin-bottom: 16px; display: block;"></i>      
-                        <h4 style="margin-bottom: 16px;">强大查询语言 | Powerful Query Language</h4>      
-                        <p style="color: #666;">支持字段选择、排除和嵌套查询语法<br/>Field selection, exclusion and nested query syntax support</p>      
-                    </div>      
-                </div>      
-                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
-                    <div style="text-align: center;">      
-                        <i class="fa fa-cogs fa-3x" style="color:rgb(201, 56, 43); margin-bottom: 16px; display: block;"></i>      
-                        <h4 style="margin-bottom: 16px;">批量操作 | Batch Operations</h4>      
-                        <p style="color: #666;">支持批量创建、更新和删除操作<br/>Support for batch create, update and delete operations</p>      
-                    </div>      
-                </div>      
-                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
-                    <div style="text-align: center;">      
-                        <i class="fa fa-play fa-3x" style="color:rgb(201, 56, 43); margin-bottom: 16px; display: block;"></i>      
-                        <h4 style="margin-bottom: 16px;">方法调用 | Method Invocation</h4>      
-                        <p style="color: #666;">直接调用 Odoo 模型和记录方法<br/>Direct invocation of Odoo model and record methods</p>      
-                    </div>      
-                </div>      
-            </div>      
-        </div>      
-    </div>      
-</section>      
   
 <section class="oe_container">      
     <div class="oe_row oe_spaced">      
         <div class="oe_span12">      
-            <h2 class="oe_slogan" style="color:rgb(201, 56, 43);">      
-                应用场景 | Use Cases      
-            </h2>      
-            <div style="text-align: center; margin: 0 -15px; font-size: 0;">      
-                <div style="display: inline-block; width: 50%; padding: 0 15px; margin-bottom: 32px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
-                    <div style="padding: 20px;">      
-                        <h4><i class="fa fa-mobile" style="margin-right: 8px;"></i> 移动应用集成 | Mobile App Integration</h4>      
-                        <p style="color: #666;">为移动应用提供标准 REST API 接口，实现数据同步<br/>Provide standard REST API interface for mobile apps and data synchronization</p>      
+            <h2 class="oe_slogan" style="color:rgb(201, 56, 43);">API 规格总览 | API Specification Overview</h2>      
+            <div style="padding: 20px; background-color: #f8f9fa; border-radius: 8px; margin-bottom: 30px;">  
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">  
+                    <div style="flex: 1; min-width: 200px; margin: 10px;">  
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 10px;">基础信息 | Basic Info</h4>  
+                        <ul style="list-style: none; padding: 0;">  
+                            <li><strong>API 版本:</strong> v1</li>  
+                            <li><strong>基础 URL:</strong> /api/v1</li>  
+                            <li><strong>认证方式:</strong> Bearer Token</li>  
+                            <li><strong>响应格式:</strong> JSON</li>  
+                        </ul>  
+                    </div>  
+                    <div style="flex: 1; min-width: 200px; margin: 10px;">  
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 10px;">支持方法 | HTTP Methods</h4>  
+                        <ul style="list-style: none; padding: 0;">  
+                            <li><span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;">GET</span> 查询数据</li>  
+                            <li><span style="background: #007bff; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;">POST</span> 创建数据</li>  
+                            <li><span style="background: #ffc107; color: black; padding: 2px 6px; border-radius: 3px; font-size: 12px;">PUT</span> 更新数据</li>  
+                            <li><span style="background: #dc3545; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;">DELETE</span> 删除数据</li>  
+                        </ul>  
+                    </div>  
+                </div>  
+            </div>  
+        </div>      
+    </div>      
+</section>  
+  
+<section class="oe_container oe_dark">      
+    <div class="oe_row oe_spaced">      
+        <div class="oe_span12">      
+            <h2 class="oe_slogan" style="color:rgb(201, 56, 43);">核心 CRUD 端点 | Core CRUD Endpoints</h2>      
+            <div style="text-align: left; margin: 0 -15px; font-size: 0;">      
+                <div style="display: inline-block; width: 50%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
+                    <div style="background: white; padding: 20px; border-radius: 8px; height: 100%;">      
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">  
+                            <span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 10px;">GET</span>  
+                            获取记录 | Get Records  
+                        </h4>      
+                        <p style="margin-bottom: 10px;"><strong>端点:</strong> <code>/api/v1/{model}</code></p>  
+                        <p style="margin-bottom: 10px;"><strong>单个记录:</strong> <code>/api/v1/{model}/{id}</code></p>  
+                        <p style="margin-bottom: 10px;"><strong>参数:</strong></p>  
+                        <ul style="font-size: 12px; color: #666;">  
+                            <li>query: 字段选择语法</li>  
+                            <li>filter: JSON 域过滤器</li>  
+                            <li>limit: 最大记录数 (≤1000)</li>  
+                            <li>page_size: 每页记录数</li>  
+                        </ul>  
                     </div>      
                 </div>      
-                <div style="display: inline-block; width: 50%; padding: 0 15px; margin-bottom: 32px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
-                    <div style="padding: 20px;">      
-                        <h4><i class="fa fa-exchange" style="margin-right: 8px;"></i> 第三方系统集成 | Third-party Integration</h4>      
-                        <p style="color: #666;">与外部系统进行数据交换和业务流程集成<br/>Data exchange and business process integration with external systems</p>      
+                <div style="display: inline-block; width: 50%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
+                    <div style="background: white; padding: 20px; border-radius: 8px; height: 100%;">      
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">  
+                            <span style="background: #007bff; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 10px;">POST</span>  
+                            创建记录 | Create Records  
+                        </h4>      
+                        <p style="margin-bottom: 10px;"><strong>端点:</strong> <code>/api/v1/{model}/</code></p>  
+                        <p style="margin-bottom: 10px;"><strong>批量创建:</strong> <code>/api/v1/{model}/batch</code></p>  
+                        <p style="margin-bottom: 10px;"><strong>请求体:</strong></p>  
+                        <pre style="font-size: 11px; background: #f8f9fa; padding: 8px; border-radius: 4px; overflow-x: auto;">  
+{  
+  "data": { /* 记录数据 */ },  
+  "context": { /* 可选上下文 */ }  
+}</pre>  
                     </div>      
                 </div>      
-                <div style="display: inline-block; width: 50%; padding: 0 15px; margin-bottom: 32px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
-                    <div style="padding: 20px;">      
-                        <h4><i class="fa fa-cloud" style="margin-right: 8px;"></i> 微服务架构 | Microservices Architecture</h4>      
-                        <p style="color: #666;">支持微服务架构中的服务间通信<br/>Support inter-service communication in microservices architecture</p>      
+                <div style="display: inline-block; width: 50%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
+                    <div style="background: white; padding: 20px; border-radius: 8px; height: 100%;">      
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">  
+                            <span style="background: #ffc107; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 10px;">PUT</span>  
+                            更新记录 | Update Records  
+                        </h4>      
+                        <p style="margin-bottom: 10px;"><strong>单个:</strong> <code>/api/v1/{model}/{id}/</code></p>  
+                        <p style="margin-bottom: 10px;"><strong>多个:</strong> <code>/api/v1/{model}/</code></p>  
+                        <p style="margin-bottom: 10px;"><strong>关系字段操作:</strong></p>  
+                        <ul style="font-size: 12px; color: #666;">  
+                            <li>create, link, unlink</li>  
+                            <li>delete, update, set, clear</li>  
+                        </ul>  
                     </div>      
                 </div>      
-                <div style="display: inline-block; width: 50%; padding: 0 15px; margin-bottom: 32px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
-                    <div style="padding: 20px;">      
-                        <h4><i class="fa fa-code" style="margin-right: 8px;"></i> 前端开发 | Frontend Development</h4>      
-                        <p style="color: #666;">为现代前端框架提供数据接口支持<br/>Provide data interface support for modern frontend frameworks</p>      
+                <div style="display: inline-block; width: 50%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
+                    <div style="background: white; padding: 20px; border-radius: 8px; height: 100%;">      
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">  
+                            <span style="background: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 10px;">DELETE</span>  
+                            删除记录 | Delete Records  
+                        </h4>      
+                        <p style="margin-bottom: 10px;"><strong>单个:</strong> <code>/api/v1/{model}/{id}/</code></p>  
+                        <p style="margin-bottom: 10px;"><strong>多个:</strong> <code>/api/v1/{model}/?id=[1,2,3]</code></p>  
+                        <p style="margin-bottom: 10px;"><strong>支持:</strong> 批量删除、条件删除</p>  
                     </div>      
                 </div>      
             </div>      
         </div>      
     </div>      
-</section>      
-    
+</section>  
+  
+<section class="oe_container">      
+    <div class="oe_row oe_spaced">      
+        <div class="oe_span12">      
+            <h2 class="oe_slogan" style="color:rgb(201, 56, 43);">高级功能端点 | Advanced Endpoints</h2>      
+            <div style="text-align: left; margin: 0 -15px; font-size: 0;">      
+                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; height: 100%;">      
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">  
+                            <i class="fa fa-play" style="margin-right: 8px;"></i>  
+                            函数调用 | Function Calls  
+                        </h4>      
+                        <p style="margin-bottom: 8px;"><strong>模型方法:</strong></p>  
+                        <code style="font-size: 11px;">/api/v1/object/{model}/{function}</code>  
+                        <p style="margin: 8px 0;"><strong>记录方法:</strong></p>  
+                        <code style="font-size: 11px;">/api/v1/object/{model}/{id}/{function}</code>  
+                    </div>      
+                </div>      
+                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; height: 100%;">      
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">  
+                            <i class="fa fa-search" style="margin-right: 8px;"></i>  
+                            高级搜索 | Advanced Search  
+                        </h4>      
+                        <p style="margin-bottom: 8px;"><strong>端点:</strong></p>  
+                        <code style="font-size: 11px;">/api/v1/{model}/search</code>  
+                        <p style="margin: 8px 0;"><strong>支持:</strong> 复杂域查询、字段选择、排序</p>  
+                    </div>      
+                </div>      
+                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; height: 100%;">      
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">  
+                            <i class="fa fa-info-circle" style="margin-right: 8px;"></i>  
+                            元数据 | Metadata  
+                        </h4>      
+                        <p style="margin-bottom: 8px;"><strong>字段信息:</strong></p>  
+                        <code style="font-size: 11px;">/api/v1/{model}/fields</code>  
+                        <p style="margin: 8px 0;"><strong>文件下载:</strong></p>  
+                        <code style="font-size: 11px;">/api/v1/{model}/{id}/{field}</code>  
+                    </div>      
+                </div>      
+            </div>      
+        </div>      
+    </div>      
+</section>  
+  
+<section class="oe_container oe_dark">      
+    <div class="oe_row oe_spaced">      
+        <div class="oe_span12">      
+            <h2 class="oe_slogan" style="color:rgb(201, 56, 43);">查询语言规格 | Query Language Specification</h2>      
+            <div style="background: white; padding: 30px; border-radius: 8px; margin: 20px 0;">  
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">  
+                    <div style="flex: 1; min-width: 300px; margin-right: 20px;">  
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">字段选择语法 | Field Selection Syntax</h4>  
+                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">  
+                            <tr style="background: #f8f9fa;">  
+                                <th style="padding: 8px; border: 1px solid #dee2e6; text-align: left;">语法 | Syntax</th>  
+                                <th style="padding: 8px; border: 1px solid #dee2e6; text-align: left;">说明 | Description</th>  
+                            </tr>  
+                            <tr>  
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><code>{id, name}</code></td>  
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">选择特定字段 | Select specific fields</td>  
+                            </tr>  
+                            <tr style="background: #f8f9fa;">  
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><code>{*}</code></td>  
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">选择所有字段 | Select all fields</td>  
+                            </tr>  
+                            <tr>  
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><code>{-password}</code></td>  
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">排除特定字段 | Exclude specific fields</td>  
+                            </tr>  
+                            <tr style="background: #f8f9fa;">  
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><code>{user{name, email}}</code></td>  
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">嵌套字段选择 | Nested field selection</td>  
+                            </tr>  
+                        </table>  
+                    </div>  
+                    <div style="flex: 1; min-width: 300px;">  
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">响应格式 | Response Format</h4>  
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 15px;">  
+                            <h5 style="margin-bottom: 10px; color: #28a745;">成功响应 | Success Response</h5>  
+                            <pre style="font-size: 11px; margin: 0; overflow-x: auto;">  
+{  
+  "success": true,  
+  "message": "操作成功",  
+  "data": { /* 响应数据 */ },  
+  "timestamp": "2024-01-01T12:00:00"  
+}</pre>  
+                        </div>  
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">  
+                            <h5 style="margin-bottom: 10px; color: #dc3545;">错误响应 | Error Response</h5>  
+                            <pre style="font-size: 11px; margin: 0; overflow-x: auto;">  
+{  
+  "success": false,  
+  "error": {  
+    "code": 400,  
+    "message": "错误描述",  
+    "type": "ValidationError"  
+  },  
+  "timestamp": "2024-01-01T12:00:00"  
+}</pre>  
+                        </div>  
+                    </div>  
+                </div>  
+            </div>  
+        </div>      
+    </div>      
+</section>  
+  
+<section class="oe_container">      
+    <div class="oe_row oe_spaced">      
+        <div class="oe_span12">      
+            <h2 class="oe_slogan" style="color:rgb(201, 56, 43);">系统端点 | System Endpoints</h2>      
+            <div style="text-align: left; margin: 0 -15px; font-size: 0;">      
+                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
+                    <div style="background: #e8f5e8; padding: 20px; border-radius: 8px; height: 100%;">      
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">  
+                            <i class="fa fa-heartbeat" style="margin-right: 8px;"></i>  
+                            健康检查 | Health Check  
+                        </h4>      
+                        <p style="margin-bottom: 8px;"><strong>端点:</strong></p>  
+                        <code style="font-size: 11px;">/api/v1/health</code>  
+                        <p style="margin: 8px 0; color: #28a745;"><strong>无需认证 | No Auth Required</strong></p>  
+                    </div>      
+                </div>      
+                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
+                    <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; height: 100%;">      
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">  
+                            <i class="fa fa-info" style="margin-right: 8px;"></i>  
+                            API 信息 | API Info  
+                        </h4>      
+                        <p style="margin-bottom: 8px;"><strong>端点:</strong></p>  
+                        <code style="font-size: 11px;">/api/v1/info</code>  
+                        <p style="margin: 8px 0;"><strong>返回:</strong> API 版本、端点列表</p>  
+                    </div>      
+                </div>      
+                <div style="display: inline-block; width: 33.333%; padding: 0 15px; margin-bottom: 30px; vertical-align: top; font-size: 14px; box-sizing: border-box;">      
+                    <div style="background: #fff3e0; padding: 20px; border-radius: 8px; height: 100%;">      
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">  
+                            <i class="fa fa-file-code-o" style="margin-right: 8px;"></i>  
+                            OpenAPI 规格 | OpenAPI Spec  
+                        </h4>      
+                        <p style="margin-bottom: 8px;"><strong>端点:</strong></p>  
+                        <code style="font-size: 11px;">/api/v1/openapi.json</code>  
+                        <p style="margin: 8px 0;"><strong>格式:</strong> OpenAPI 3.0</p>  
+                    </div>      
+                </div>      
+            </div>      
+        </div>      
+    </div>      
+</section>  
+  
+<section class="oe_container oe_dark">      
+    <div class="oe_row oe_spaced">      
+        <div class="oe_span12">      
+            <h2 class="oe_slogan" style="color:rgb(201, 56, 43);">使用示例 | Usage Examples</h2>      
+            <div style="background: white; padding: 30px; border-radius: 8px; margin: 20px 0;">  
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">  
+                    <div style="flex: 1; min-width: 300px; margin-right: 20px; margin-bottom: 20px;">  
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">认证设置 | Authentication Setup</h4>  
+                        <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; font-size: 12px; overflow-x: auto;">  
+headers = {  
+  'Content-Type': 'application/json',  
+  'Authorization': 'Bearer your_api_key_here'  
+}</pre>  
+                    </div>  
+                    <div style="flex: 1; min-width: 300px; margin-bottom: 20px;">  
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">获取用户 | Get Users</h4>  
+                        <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; font-size: 12px; overflow-x: auto;">  
+GET /api/v1/res.users?query={id,name,email}  
+&filter=[["active","=",true]]  
+&limit=50</pre>  
+                    </div>  
+                </div>  
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">  
+                    <div style="flex: 1; min-width: 300px; margin-right: 20px;">  
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">创建产品 | Create Product</h4>  
+                        <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; font-size: 12px; overflow-x: auto;">  
+POST /api/v1/product.template/  
+{  
+  "data": {  
+    "name": "New Product",  
+    "list_price": 100.0,  
+    "categ_id": 1  
+  }  
+}</pre>  
+                    </div>  
+                    <div style="flex: 1; min-width: 300px;">  
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">更新记录 | Update Record</h4>  
+                        <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; font-size: 12px; overflow-x: auto;">  
+PUT /api/v1/res.partner/123/  
+{  
+  "data": {  
+    "name": "Updated Name",  
+    "email": "new@email.com"  
+  }  
+}</pre>  
+                    </div>  
+                </div>  
+            </div>  
+        </div>      
+    </div>      
+</section>  
+  
+<section class="oe_container">      
+    <div class="oe_row oe_spaced">      
+        <div class="oe_span12">      
+            <h2 class="oe_slogan" style="color:rgb(201, 56, 43);">技术限制 | Technical Limitations</h2>      
+            <div style="background: #fff8e1; padding: 30px; border-radius: 8px; border-left: 4px solid #ffc107;">  
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">  
+                    <div style="flex: 1; min-width: 250px; margin-right: 20px;">  
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">请求限制 | Request Limits</h4>  
+                        <ul style="list-style: none; padding: 0;">  
+                            <li style="margin-bottom: 8px;"><i class="fa fa-check-circle" style="color: #28a745; margin-right: 8px;"></i>每次最多 1000 条记录</li>  
+                            <li style="margin-bottom: 8px;"><i class="fa fa-check-circle" style="color: #28a745; margin-right: 8px;"></i>默认限制 80 条记录</li>  
+                            <li style="margin-bottom: 8px;"><i class="fa fa-check-circle" style="color: #28a745; margin-right: 8px;"></i>支持分页查询</li>  
+                        </ul>  
+                    </div>  
+                    <div style="flex: 1; min-width: 250px;">  
+                        <h4 style="color: rgb(201, 56, 43); margin-bottom: 15px;">安全要求 | Security Requirements</h4>  
+                        <ul style="list-style: none; padding: 0;">  
+                            <li style="margin-bottom: 8px;"><i class="fa fa-shield" style="color: #dc3545; margin-right: 8px;"></i>所有端点需要认证（除健康检查）</li>  
+                            <li style="margin-bottom: 8px;"><i class="fa fa-shield" style="color: #dc3545; margin-right: 8px;"></i>Bearer Token 必须有效</li>  
+                            <li style="margin-bottom: 8px;"><i class="fa fa-shield" style="color: #dc3545; margin-right: 8px;"></i>遵循 Odoo 访问权限</li>  
+                        </ul>  
+                    </div>  
+                </div>  
+            </div>  
+        </div>      
+    </div>      
+</section>  
+  
 <section class="oe_container oe_dark">      
     <div class="oe_row oe_spaced">      
         <div class="oe_span12">      
