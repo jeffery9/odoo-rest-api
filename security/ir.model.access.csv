@@ -1,1 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ir_rest_api_idempotency_user,ir.rest.api.idempotency.user,model_ir_rest_api_idempotency,base.group_user,1,0,0,0
+access_ir_rest_api_idempotency_system,ir.rest.api.idempotency.system,model_ir_rest_api_idempotency,base.group_system,1,1,1,1
